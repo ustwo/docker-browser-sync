@@ -1,4 +1,4 @@
-.PHONY : help server
+.PHONY : help server rm reload
 
 help :
 	docker run --rm -t \
@@ -15,5 +15,14 @@ server :
 		-p 0.0.0.0:3001:3001 \
 		-v $$(pwd)/sandbox:/sandbox \
 		-w /sandbox \
+		--name browser-sync \
 		ustwo/browser-sync \
 		start --server --files="*.css"
+
+rm :
+	docker rm -f browser-sync
+
+reload :
+	docker exec -t \
+		browser-sync \
+		browser-sync reload
