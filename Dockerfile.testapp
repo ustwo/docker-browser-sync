@@ -1,0 +1,5 @@
+FROM python:2
+MAINTAINER Arnau Siches <arnau@ustwo.com>
+
+EXPOSE 8000
+CMD ["python", "-m", "SimpleHTTPServer"]
