@@ -78,11 +78,11 @@ virtualbox so it is an extra layer of indirection that can affect FS replication
 
 1. Start browser-sync
 
-    $ make server
+        $ make server
 
 2. Start the watcher (tested with fswatch)
 
-    $ make watch
+        $ make watch
 
 3. Change the CSS file in `sandbox/simple.css`;
 4. Eventually the browser changes the CSS.
