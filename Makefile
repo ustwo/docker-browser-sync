@@ -57,3 +57,12 @@ reload :
 	docker exec -t \
 		browser-sync \
 		browser-sync reload
+
+watch :
+	fswatch -or -l 0.2 $$(pwd)/sandbox \
+		| xargs -n1 \
+			docker exec -t \
+				browser-sync \
+				browser-sync reload
+
+

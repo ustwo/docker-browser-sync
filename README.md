@@ -11,7 +11,7 @@ a NFS (review this is true.)
 Important factor is that I'm running docker via docker-machine **inside**
 virtualbox so it is an extra layer of indirection that can affect FS replication.
 
-Configured with `usePolling: false`:
+### Configured with `usePolling: false`
 
 1. Spin up a server watching `*.css`;
 
@@ -32,7 +32,7 @@ Configured with `usePolling: false`:
 6. Eventually the browser changes the CSS.
 
 
-Configured with `usePolling: true`:
+### Configured with `usePolling: true`
 
 1. Spin up a server watching `*.css`;
 
@@ -51,7 +51,7 @@ Configured with `usePolling: true`:
 4. Eventually the browser changes the CSS.
 
 
-Configured with `usePolling: false` and a proxy:
+### Configured with `usePolling: false` and a proxy
 
 1. Build the app;
 
@@ -63,13 +63,30 @@ Configured with `usePolling: false` and a proxy:
 
 3. Start browser-sync
 
-        make proxy
+        $ make proxy
 
 4. Open a browser: `open http://$(docker-machine ip):3000`
 5. Change the CSS file in `sandbox/simple.css`;
 6. Nothing happens.
 7. Run `make reload`.
 8. Eventually the browser changes the CSS.
+
+
+### Configured with `usePolling: false` and watching with an external watcher
+
+(works with or without proxy)
+
+1. Start browser-sync
+
+    $ make server
+
+2. Start the watcher (tested with fswatch)
+
+    $ make watch
+
+3. Change the CSS file in `sandbox/simple.css`;
+4. Eventually the browser changes the CSS.
+
 
 
 ## Conclusions
