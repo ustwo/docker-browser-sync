@@ -17,8 +17,17 @@ server :
 		-w /sandbox \
 		--name browser-sync \
 		ustwo/browser-sync \
-		start --config bs-config.js
-		# start --server --files="*.css"
+		start --config fsevents.js
+
+polling :
+	docker run --rm -t \
+		-p 0.0.0.0:3000:3000 \
+		-p 0.0.0.0:3001:3001 \
+		-v $$(pwd)/sandbox:/sandbox \
+		-w /sandbox \
+		--name browser-sync \
+		ustwo/browser-sync \
+		start --config polling.js
 
 rm :
 	docker rm -f browser-sync
