@@ -72,6 +72,13 @@ Configured with `usePolling: false` and a proxy:
 8. Eventually the browser changes the CSS.
 
 
+## Conclusions
+
+Even though tests using the polling strategy feel a bit slow, it could be fast
+enough for regular work.  Needs to be tested with a real project.
+
+If that doesn't suit you, install browser-sync in your machine as always and
+use it as a proxy against your Docker image.
 
 
 ## Quick start
@@ -95,4 +102,3 @@ To access browser-sync hit your docker ip (using docker-machine
 `docker-machine ip <env>`, using boot2docker `boot2docker ip`).
 I.e `http://192.168.99.10:3000`
 
-# 
