@@ -20,7 +20,8 @@ module.exports = {
     },
     "files": "*.css",
     "watchOptions": {
-      "usePolling": true
+      "usePolling": true,
+      // "interval": 50
     },
     "server": true,
     "proxy": false,
@@ -41,7 +42,7 @@ module.exports = {
     "logFileChanges": true,
     "logSnippet": true,
     "rewriteRules": false,
-    "open": "local",
+    "open": false,
     "browser": "default",
     "xip": false,
     "hostnameSuffix": false,
