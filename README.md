@@ -8,18 +8,42 @@ As far as I understand browser-sync tries to rely on OS FS events to trigger a
 reload.  The host events are not propagated to the guest (docker) FS as it is
 a NFS (review this is true.)
 
-A simple case:
+A default case (tries to use FS events):
 
 1. Spin up a server watching `*.css`;
 
-    $ make server
+    $ docker run --rm -t \
+        -p 0.0.0.0:3000:3000 \
+        -p 0.0.0.0:3001:3001 \
+        -v $$(pwd)/sandbox:/sandbox \
+        -w /sandbox \
+        --name browser-sync \
+        ustwo/browser-sync \
+        start --server --files="*.css"
 
 2. Open a browser: `open http://$(docker-machine ip):3000`
-2. Change the CSS file in `sandbox/simple.css`;
-3. Nothing happens.
-4. Run `make reload`.
-5. Eventually the browser changes the CSS.
+3. Change the CSS file in `sandbox/simple.css`;
+4. Nothing happens.
+5. Run `make reload`.
+6. Eventually the browser changes the CSS.
 
+
+Configured with `usePolling: true`:
+
+1. Spin up a server watching `*.css`;
+
+    $ docker run --rm -t \
+        -p 0.0.0.0:3000:3000 \
+        -p 0.0.0.0:3001:3001 \
+        -v $$(pwd)/sandbox:/sandbox \
+        -w /sandbox \
+        --name browser-sync \
+        ustwo/browser-sync \
+        start --config bs-config.js
+
+2. Open a browser: `open http://$(docker-machine ip):3000`
+3. Change the CSS file in `sandbox/simple.css`;
+4. Eventually the browser changes the CSS.
 
 
 

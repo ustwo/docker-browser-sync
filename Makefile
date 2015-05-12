@@ -17,7 +17,8 @@ server :
 		-w /sandbox \
 		--name browser-sync \
 		ustwo/browser-sync \
-		start --server --files="*.css"
+		start --config bs-config.js
+		# start --server --files="*.css"
 
 rm :
 	docker rm -f browser-sync
