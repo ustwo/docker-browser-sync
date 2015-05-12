@@ -2,8 +2,8 @@
 
 help :
 	docker run --rm -t \
-		-p 0.0.0.0:3000:3000 \
-		-p 0.0.0.0:3001:3001 \
+		-p 3000:3000 \
+		-p 3001:3001 \
 		-v $$(pwd)/sandbox:/sandbox \
 		-w /sandbox \
 		ustwo/browser-sync \
@@ -11,8 +11,8 @@ help :
 
 server :
 	docker run --rm -t \
-		-p 0.0.0.0:3000:3000 \
-		-p 0.0.0.0:3001:3001 \
+		-p 3000:3000 \
+		-p 3001:3001 \
 		-v $$(pwd)/sandbox:/sandbox \
 		-w /sandbox \
 		--name browser-sync \
@@ -24,7 +24,7 @@ build.app :
 
 app :
 	docker run -d \
-		-p 0.0.0.0:8000:8000 \
+		-p 8000:8000 \
 		-v $$(pwd)/sandbox:/sandbox \
 		-w /sandbox \
 		--name testapp \
@@ -32,8 +32,8 @@ app :
 
 proxy :
 	docker run --rm -t \
-		-p 0.0.0.0:3000:3000 \
-		-p 0.0.0.0:3001:3001 \
+		-p 3000:3000 \
+		-p 3001:3001 \
 		-v $$(pwd)/sandbox:/sandbox \
 		-w /sandbox \
 		--name browser-sync \
@@ -42,8 +42,8 @@ proxy :
 
 polling :
 	docker run --rm -t \
-		-p 0.0.0.0:3000:3000 \
-		-p 0.0.0.0:3001:3001 \
+		-p 3000:3000 \
+		-p 3001:3001 \
 		-v $$(pwd)/sandbox:/sandbox \
 		-w /sandbox \
 		--name browser-sync \
