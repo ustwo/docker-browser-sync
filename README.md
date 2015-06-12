@@ -119,3 +119,7 @@ To access browser-sync hit your docker ip (using docker-machine
 `docker-machine ip <env>`, using boot2docker `boot2docker ip`).
 I.e `http://192.168.99.10:3000`
 
+
+## Maintainers
+
+* [Arnau Siches](mailto:arnau@ustwo.com)
