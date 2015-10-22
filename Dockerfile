@@ -1,8 +1,6 @@
 FROM ustwo/nodejs:4.1.1
 MAINTAINER Arnau Siches <arnau@ustwo.com>
 
-# TODO: optional dep failed, continuing fsevents@0.3.6
-USER root
 RUN apk add --update \
       make \
       python-dev \
