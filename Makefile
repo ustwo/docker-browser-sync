@@ -1,68 +1,82 @@
-.PHONY : help server proxy polling rm reload build.app app
-
-help :
-	docker run --rm -t \
-		-p 3000:3000 \
-		-p 3001:3001 \
-		-v $$(pwd)/sandbox:/sandbox \
-		-w /sandbox \
-		ustwo/browser-sync \
-		--help
-
-server :
-	docker run --rm -t \
-		-p 3000:3000 \
-		-p 3001:3001 \
-		-v $$(pwd)/sandbox:/sandbox \
-		-w /sandbox \
-		--name browser-sync \
-		ustwo/browser-sync \
-		start --config fsevents.js
-
-build.app :
-	docker build -t "testapp" -f Dockerfile.testapp .
-
-app :
-	docker run -d \
-		-p 8000:8000 \
-		-v $$(pwd)/sandbox:/sandbox \
-		-w /sandbox \
-		--name testapp \
-		testapp
-
-proxy :
-	docker run --rm -t \
-		-p 3000:3000 \
-		-p 3001:3001 \
-		-v $$(pwd)/sandbox:/sandbox \
-		-w /sandbox \
-		--name browser-sync \
-		ustwo/browser-sync \
-		start --config proxy.js
-
-polling :
-	docker run --rm -t \
-		-p 3000:3000 \
-		-p 3001:3001 \
-		-v $$(pwd)/sandbox:/sandbox \
-		-w /sandbox \
-		--name browser-sync \
-		ustwo/browser-sync \
-		start --config polling.js
-
-rm :
-	docker rm -f browser-sync
-
-reload :
-	docker exec -t \
-		browser-sync \
-		browser-sync reload
-
-watch :
-	fswatch -or -l 0.2 $$(pwd)/sandbox \
-		| xargs -n1 \
-			docker exec -t \
-				browser-sync \
-				browser-sync reload
+name := browser-sync
+image_name := ustwo/$(name)
+FLAGS = -v $(PWD)/sandbox:/sandbox \
+        -w /sandbox
 
 
+DOCKER := docker
+DOCKER_TASK := $(DOCKER) run --rm -it
+DOCKER_PROC := $(DOCKER) run -d -it
+
+.PHONY: app \
+        app-build \
+        build \
+        fsevents \
+        help \
+        polling \
+        proxy \
+        reload \
+        rm
+
+
+default: build
+
+build:
+	@$(DOCKER) build -t $(image_name) .
+
+rm:
+	@$(docker) rm -vf $(name)
+
+shell:
+	@$(call task,--entrypoint=sh,)
+
+test-proxy:
+	@$(call proc,start --config proxy.js)
+
+test-polling:
+	@$(call proc,start --config polling.js)
+
+fsevents:
+	@$(call proc,start --config fsevents.js)
+
+reload:
+	@$(DOCKER) exec -t \
+    $(name) \
+    $(name) reload
+
+help:
+	@$(call task,,--help)
+
+
+###############################################################################
+# Helpers                                                                     #
+###############################################################################
+app_name := testapp
+APP_PORT = 8000
+
+app-build:
+	$(DOCKER) build -t $(app_name) -f Dockerfile.$(app_name) .
+
+app:
+	$(DOCKER_PROC) \
+    -p $(APP_PORT):8000 \
+    $(FLAGS) \
+    --name $(app_name) \
+    $(app_name)
+
+define task
+  $(DOCKER_TASK) \
+    $(FLAGS) \
+    $1 \
+    $(image_name) \
+    $2
+endef
+
+define proc
+  $(DOCKER_PROC) \
+    $(FLAGS) \
+    -p 3000:3000 \
+    -p 3001:3001 \
+    $(image_name) \
+    $1
+endef
