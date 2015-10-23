@@ -71,7 +71,7 @@ docker run --rm -t \
            -p 3001:3001 \
            -v $(PWD)/src:/source \
            -w /source \
-           --add-host dkr:172.17.42.1
+           --add-host dkr:172.17.42.1 \
            --name bs \
            ustwo/browser-sync \
            start --files "*.css" \
