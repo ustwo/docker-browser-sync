@@ -1,123 +1,107 @@
 # Docker image for browser-sync
 
-**THIS IMAGE IS NOT READY**
+Docker has limited support of filesystem events.  [BrowserSync](http://www.browsersync.io/)
+uses filesystem events as its main strategy to watch for changes and falls back
+to polling otherwise.  My current understanding is that host filesystem events
+are not propagated to the guest (Docker) filesystem given that it is a NFS.
 
-## Notes on watching files
+This image has been tested only in MacOSX using VirtualBox.
 
-As far as I understand browser-sync tries to rely on OS FS events to trigger a
-reload.  The host events are not propagated to the guest (docker) FS as it is
-a NFS (review this is true.)
-
-Important factor is that I'm running docker via docker-machine **inside**
-virtualbox so it is an extra layer of indirection that can affect FS replication.
-
-### Configured with `usePolling: false`
-
-1. Spin up a server watching `*.css`;
-
-        # make server
-        $ docker run --rm -t \
-            -p 0.0.0.0:3000:3000 \
-            -p 0.0.0.0:3001:3001 \
-            -v $$(pwd)/sandbox:/sandbox \
-            -w /sandbox \
-            --name browser-sync \
-            ustwo/browser-sync \
-            start --config fsevents.js
-
-2. Open a browser: `open http://$(docker-machine ip):3000`
-3. Change the CSS file in `sandbox/simple.css`;
-4. Nothing happens.
-5. Run `make reload`.
-6. Eventually the browser changes the CSS.
+This image is based on the great [Alpine Linux](http://alpinelinux.org/).
 
 
-### Configured with `usePolling: true`
+## Usage
 
-1. Spin up a server watching `*.css`;
+The entrypoint of this image is the `browser-sync` CLI so you should use it in
+a similar way you use `browser-sync`.
 
-        # make polling
-        $ docker run --rm -t \
-            -p 0.0.0.0:3000:3000 \
-            -p 0.0.0.0:3001:3001 \
-            -v $$(pwd)/sandbox:/sandbox \
-            -w /sandbox \
-            --name browser-sync \
-            ustwo/browser-sync \
-            start --config polling.js
+Simple watcher:
 
-2. Open a browser: `open http://$(docker-machine ip):3000`
-3. Change the CSS file in `sandbox/simple.css`;
-4. Eventually the browser changes the CSS.
+```sh
+docker run --rm -t \
+           -p 3000:3000 \
+           -p 3001:3001 \
+           -v $(PWD)/src:/source \
+           -w /source \
+           --name bs \
+           ustwo/browser-sync \
+           start --files "*.css"
+```
 
+Or create an alias to hide the noise:
 
-### Configured with `usePolling: false` and a proxy
+```sh
+alias browser-sync="docker run --rm -t \
+                               -p 3000:3000 \
+                               -p 3001:3001 \
+                               -v $(PWD)/src:/source \
+                               -w /source \
+                               --name bs \
+                               ustwo/browser-sync"
+```
 
-1. Build the app;
+And then just do the normal browser-sync command:
 
-        $ make build.app
-
-2. Start the app;
-
-        $ make app
-
-3. Start browser-sync
-
-        $ make proxy
-
-4. Open a browser: `open http://$(docker-machine ip):3000`
-5. Change the CSS file in `sandbox/simple.css`;
-6. Nothing happens.
-7. Run `make reload`.
-8. Eventually the browser changes the CSS.
+```sh
+browser-sync help
+```
 
 
-### Configured with `usePolling: false` and watching with an external watcher
+Proxy dockerised app:
 
-(works with or without proxy)
+```sh
+docker run --rm -t \
+           -p 3000:3000 \
+           -p 3001:3001 \
+           -v $(PWD)/src:/source \
+           -w /source \
+           --link myapp:myapp \
+           --name bs \
+           ustwo/browser-sync \
+           start --files "*.css" \
+                 --proxy "myapp:8888"
+```
 
-1. Start browser-sync
+Docker links are limiting so meanwhile there is no better connectivity between
+containers you can use the `docker0` interface:
 
-        $ make server
+```sh
+docker run --rm -t \
+           -p 3000:3000 \
+           -p 3001:3001 \
+           -v $(PWD)/src:/source \
+           -w /source \
+           --add-host dkr:172.17.42.1
+           --name bs \
+           ustwo/browser-sync \
+           start --files "*.css" \
+                 --proxy "dkr:8888"
+```
 
-2. Start the watcher (tested with fswatch)
+You can use an external Browser Sync config file with something on the lines of:
 
-        $ make watch
-
-3. Change the CSS file in `sandbox/simple.css`;
-4. Eventually the browser changes the CSS.
-
-
-
-## Conclusions
-
-Even though tests using the polling strategy feel a bit slow, it could be fast
-enough for regular work.  Needs to be tested with a real project.
-
-If that doesn't suit you, install browser-sync in your machine as always and
-use it as a proxy against your Docker image.
-
-
-## Quick start
-
-The entrypoint of this image is `browser-sync` so you should use it in a similar way you use `browser-sync`.
-
-    $ browser-sync start --proxy="192.168.99.100:8888" --files="*.css"
-
-Would be equivalent to
-
-    $ docker run --rm -t -p 0.0.0.0:3000:3000  -p 0.0.0.0:3001:3001 -v $(pwd):/data -w /data ustwo/browser-sync --proxy="localhost:8888" --files="*.css"
+```sh
+docker run --rm -t \
+           -p 3000:3000 \
+           -p 3001:3001 \
+           -v $(PWD)/src:/source \
+           -w /source \
+           --name bs \
+           ustwo/browser-sync \
+           start --config /source/config.js
+```
 
 
-A more complex case would be proxying to a dockerised app:
+## Developing the image
 
-    $ docker run -d --name myapp -p 8888:80 -v $(pwd):/home/myapp -w /home/myapp myapp
-    $ docker run --rm -t -p 0.0.0.0:3000:3000  -p 0.0.0.0:3001:3001 --volumes-from myapp -w /home/myapp ustwo/browser-sync --proxy="192.168.99.100:8888" --files="*.css"
+There are a couple of Make tasks to simplify the common actions when developing:
 
-
-To access browser-sync hit your docker ip (using docker-machine
-`docker-machine ip <env>`, using boot2docker `boot2docker ip`).
-I.e `http://192.168.99.10:3000`
+* `make` builds the image
+* `make test-polling` tests the polling strategy.
+* `make test-fsevents` tests the filesystem events strategy. Does not work as
+explained before.
+* `make test-proxy` tests proxying another app (run `make app` to complement it).
+* `make rm` remove the Browser Sync container.
 
 
 ## Maintainers

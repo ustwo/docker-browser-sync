@@ -36,7 +36,7 @@ test-proxy:
 test-polling:
 	@$(call proc,start --config polling.js)
 
-fsevents:
+test-fsevents:
 	@$(call proc,start --config fsevents.js)
 
 reload:
