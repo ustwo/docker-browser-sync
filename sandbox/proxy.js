@@ -20,7 +20,8 @@ module.exports = {
     },
     "files": "*.css",
     "watchOptions": {
-      "usePolling": false
+      "usePolling": true,
+      "interval": 20
     },
     "server": false,
     "proxy": "192.168.99.100:8000",

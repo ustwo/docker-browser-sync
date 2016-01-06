@@ -92,18 +92,6 @@ docker run --rm -t \
 ```
 
 
-## Developing the image
-
-There are a couple of Make tasks to simplify the common actions when developing:
-
-* `make` builds the image
-* `make test-polling` tests the polling strategy.
-* `make test-fsevents` tests the filesystem events strategy. Does not work as
-explained before.
-* `make test-proxy` tests proxying another app (run `make app` to complement it).
-* `make rm` remove the Browser Sync container.
-
-
 ## Maintainers
 
 * [Arnau Siches](mailto:arnau@ustwo.com)

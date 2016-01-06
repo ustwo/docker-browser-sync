@@ -41,20 +41,23 @@ help:
 
 
 ###############################################################################
+# Test                                                                        #
+###############################################################################
+app-install:
+	$(DOCKER_PROC) -p 8000:8000 \
+                 --name testapp \
+                 -v $(PWD)/sandbox:/sandbox \
+                 -w /sandbox \
+                 python:2 python -m SimpleHTTPServer
+.PHONY: app-install
+
+app-clean:
+	$(DOCKER) rm -vf testapp
+.PHONY: app-clean
+
+###############################################################################
 # Helpers                                                                     #
 ###############################################################################
-app_name := testapp
-APP_PORT = 8000
-
-app-build:
-	$(DOCKER) build -t $(app_name) -f Dockerfile.$(app_name) .
-.PHONY: app-build
-
-app:
-	$(DOCKER_PROC) -p $(APP_PORT):8000 \
-                 --name $(app_name) \
-                 $(app_name)
-.PHONY: app
 
 define task
   $(DOCKER_TASK) $(FLAGS) \
