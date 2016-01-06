@@ -1,4 +1,4 @@
-FROM ustwo/nodejs:4.1.1
+FROM ustwo/nodejs:4.2
 MAINTAINER Arnau Siches <arnau@ustwo.com>
 
 RUN apk add --update \
