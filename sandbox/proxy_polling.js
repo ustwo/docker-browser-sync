@@ -24,7 +24,7 @@ module.exports = {
       "interval": 20
     },
     "server": false,
-    "proxy": "192.168.99.100:8000",
+    "proxy": "testapp:8000",
     "port": 3000,
     "middleware": false,
     "ghostMode": {

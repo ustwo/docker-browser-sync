@@ -1,10 +1,9 @@
-FROM ustwo/nodejs:4.2
+# FROM ustwo/nodejs:4.2
+FROM node:6-slim
 MAINTAINER Arnau Siches <arnau@ustwo.com>
 
-RUN apk add --update \
-      make \
-      python-dev \
- && rm -rf /var/cache/apk/* \
- && npm -g install browser-sync
+RUN npm -g install browser-sync
+
+WORKDIR /source
 
 ENTRYPOINT ["browser-sync"]

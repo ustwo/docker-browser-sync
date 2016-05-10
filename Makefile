@@ -1,7 +1,7 @@
 name := browser-sync
 image_name := ustwo/$(name)
-FLAGS = -v $(PWD)/sandbox:/sandbox \
-        -w /sandbox
+FLAGS = -v $(PWD)/sandbox:/source \
+        --name $(name)
 
 DOCKER := docker
 DOCKER_TASK := $(DOCKER) run --rm -it
@@ -11,17 +11,43 @@ build:
 	@$(DOCKER) build -t $(image_name) .
 .PHONY: build
 
-clean:
-	@$(DOCKER) rm -vf $(name)
-.PHONY: clean
+push:
+	@$(DOCKER) push $(image_name)
+.PHONY: push
 
 shell:
 	@$(call task,--entrypoint=sh,)
 .PHONY: shell
 
-test-proxy:
-	@$(call proc,start --config proxy.js)
+
+###############################################################################
+# Test                                                                        #
+###############################################################################
+test-clean:
+	$(DOCKER) rm -vf $(name) testapp
+	$(DOCKER) network rm bs
+.PHONY: clean
+
+test-proxy: test-app
+	$(call proc,start --proxy=testapp:8000 --files="*.css")
 .PHONY: test-proxy
+
+test-server:
+	$(DOCKER_PROC) $(FLAGS) \
+                 -p 3000:3000 \
+                 -p 3001:3001 \
+                 $(image_name) \
+                 $1 start --server --files "*.css"
+.PHONY: test-server
+
+
+test-proxy-polling: test-app
+	@$(call proc,start --config proxy_polling.js)
+.PHONY: test-proxy-polling
+
+test-proxy-fsevents: test-app
+	@$(call proc,start --config proxy_fsevents.js)
+.PHONY: test-proxy-fsevents
 
 test-polling:
 	@$(call proc,start --config polling.js)
@@ -31,29 +57,16 @@ test-fsevents:
 	@$(call proc,start --config fsevents.js)
 .PHONY: test-fsevents
 
-reload:
-	@$(DOCKER) exec -t $(name) reload
-.PHONY: reload
 
-help:
-	@$(call task,,--help)
-.PHONY: help
-
-
-###############################################################################
-# Test                                                                        #
-###############################################################################
-app-install:
+test-app:
+	$(DOCKER) network create bs
 	$(DOCKER_PROC) -p 8000:8000 \
                  --name testapp \
+                 --net bs \
                  -v $(PWD)/sandbox:/sandbox \
                  -w /sandbox \
                  python:2 python -m SimpleHTTPServer
-.PHONY: app-install
-
-app-clean:
-	$(DOCKER) rm -vf testapp
-.PHONY: app-clean
+.PHONY: test-app
 
 ###############################################################################
 # Helpers                                                                     #
@@ -68,6 +81,7 @@ endef
 
 define proc
   $(DOCKER_PROC) $(FLAGS) \
+                 --net bs \
                  -p 3000:3000 \
                  -p 3001:3001 \
                  $(image_name) \
