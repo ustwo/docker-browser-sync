@@ -1,4 +1,3 @@
-# FROM ustwo/nodejs:4.2
 FROM node:6-slim
 MAINTAINER Arnau Siches <arnau@ustwo.com>
 
