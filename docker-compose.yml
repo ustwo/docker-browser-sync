@@ -1,0 +1,8 @@
+bs:
+  image: ustwo/browser-sync
+  command: start --server --files "*.css"
+  volumes:
+    - ./sandbox:/source
+  ports:
+    - "3000:3000"
+    - "3001:3001"

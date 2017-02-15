@@ -105,6 +105,11 @@ docker run -dt \
 ```
 
 
+## Docker Compose
+
+Take a look to [docker-compose.yml](./docker-compose.yml) for a simple case.
+
+
 ## Docker Machine in OSX
 
 Docker Machine with Virtualbox has limited support of filesystem events.
