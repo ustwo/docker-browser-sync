@@ -113,6 +113,15 @@ strategy to watch for changes and falls back to polling otherwise.  If you are
 in this situation you can only use the polling strategy as shown in `sandbox/polling.js`.
 
 
+## Contact
+
+* open.source@ustwo.com
+
+
 ## Maintainers
 
-* [Arnau Siches](mailto:arnau@ustwo.com)
+* Arnau Siches (@arnau)
+
+## License
+
+There is no guarantee of active maintenance. Licensed under MIT.
